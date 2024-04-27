@@ -1,0 +1,126 @@
+/* GENERAL */
+
+/* Font importation */
+
+/* CSS normalization */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  position: relative;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  width: 100dvw;
+  height: 100dvh;
+}
+
+@media (max-width: 768px) and (orientation: landscape) {
+  body {
+    height: 100vh;
+  }
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Variables */
+
+/* Layout */
+
+#wrapper {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+#calculator {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  width: 100%;
+  height: 100%;
+  background: #7e6868;
+}
+
+#screen {
+  height: 30%;
+  width: 100%;
+  background: #000;
+}
+
+#buttons-row-1 {
+  height: 14%;
+  width: 100%;
+  background: red;
+}
+
+#buttons-row-2 {
+  height: 56%;
+  width: 25%;
+  background: yellow;
+}
+
+#numeric-buttons {
+  height: 56%;
+  width: 75%;
+  background: darkblue;
+}
+
+@media (max-width: 1023.98px) and (orientation: landscape) {
+  #calculator {
+    flex-direction: column;
+  }
+
+  #screen {
+    height: 50%;
+    width: 50%;
+  }
+
+  #buttons-row-1 {
+    height: 25%;
+    width: 50%;
+  }
+
+  #buttons-row-2 {
+    height: 25%;
+    width: 50%;
+  }
+
+  #numeric-buttons {
+    width: 50%;
+    height: 100%;
+  }
+
+}
+
+@media (min-width: 768px) and (orientation: portrait) {
+  #calculator {
+    height: 60%;
+    width: auto;
+    aspect-ratio: 3/4;
+  }
+}
+
+@media (min-width: 1024px) and (orientation: landscape) {
+  #calculator {
+    height: 80%;
+    width: auto;
+    aspect-ratio: 3/4;
+  }
+}
+
+
+  
+
+/* Aesthetics */
