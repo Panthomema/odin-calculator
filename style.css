@@ -38,14 +38,23 @@ button {
   --color-general: #363636;
   --border-general: clamp(2px, 0.4vmin, 6px) solid var(--color-general);
   --bg-calculator: #a7a7a7;
+
   --color-btn-general: #eeeeee;
   --color-btn-general-hover: #cccccc;
+  --color-btn-general-active: #aaaaaa;
+
   --color-btn-red: #f5a2a2;
   --color-btn-red-hover: #d38080;
+  --color-btn-red-active: #b15e5e;
+
   --color-btn-blue: #aaaaf7;
   --color-btn-blue-hover: #8888d5;
+  --color-btn-blue-active: #6666b3;
+
   --color-btn-yellow: #f5d58f;
   --color-btn-yellow-hover: #d3b35d;
+  --color-btn-yellow-active: #b1913b;
+
   --fs-general: clamp(1rem, 3vmin, 3rem);
   --fs-prev-operation: clamp(0.75rem, 3vmin, 3rem);
   --fs-curr-operation: clamp(2rem, 6vmin, 6rem);
@@ -129,6 +138,7 @@ button {
   border: var(--border-general);
   border-radius: 3vmin;
   color: var(--color-general);
+  user-select: none;
 }
 
 #screen {
@@ -155,11 +165,15 @@ button {
   border: var(--border-general);
   border-radius: 0.5vmin;
   font-size: var(--fs-general);
-  transition: background 0.3s ease;
+  transition: background 0.25s ease;
 }
 
 button:hover {
   background: var(--color-btn-general-hover);
+}
+
+button:active {
+  background: var(--color-btn-general-active);
 }
 
 .btn-red {
@@ -170,6 +184,10 @@ button:hover {
   background: var(--color-btn-red-hover);
 }
 
+.btn-red:active {
+  background: var(--color-btn-red-active);
+}
+
 .btn-blue {
   background: var(--color-btn-blue);
 }
@@ -178,10 +196,18 @@ button:hover {
   background: var(--color-btn-blue-hover);
 }
 
+.btn-blue:active {
+  background: var(--color-btn-blue-active);
+}
+
 .btn-yellow {
   background: var(--color-btn-yellow);
 }
 
 .btn-yellow:hover {
   background: var(--color-btn-yellow-hover)
+}
+
+.btn-yellow:active {
+  background: var(--color-btn-yellow-active);
 }
