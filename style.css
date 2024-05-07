@@ -95,11 +95,11 @@ button {
   align-items: center;
 }
 
-#previous-operation-area {
+#memory-display {
   flex: 1;
 }
 
-#current-operation-area {
+#main-display {
   flex: 2;
 }
 
@@ -152,11 +152,11 @@ button {
   font-weight: 500;
 }
 
-#previous-operation-area {
+#memory-display {
   font-size: var(--fs-prev-operation);
 }
 
-#current-operation-area {
+#main-display {
   font-size: var(--fs-curr-operation);
 }
 
