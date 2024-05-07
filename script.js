@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   const mainDisplay = new Display('#main-display', '0');
+
+  // Validates and updates the display content
+
   mainDisplay.update = function(value) {
     const display = this.htmlElement;
 
@@ -28,6 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
     } 
   }
 
+  // Changes display content symbol
+
   mainDisplay.changeSymbol = function() {
     const display = this.htmlElement;
 
@@ -39,6 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
       display.textContent = '-' + display.textContent;
     }
   }
+
+  // Deletes last digit from content
 
   mainDisplay.delete = function() {
     const display = this.htmlElement;
@@ -56,6 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const memoryDisplay = new Display('#memory-display', '');
+
+  // Updates the content
+
   memoryDisplay.update = function(value) {
     this.htmlElement.textContent += (this.htmlElement.textContent === '')
       ? value
@@ -63,6 +73,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const calculator = new Calculator();
+
+  // Adding listeners
 
   document.querySelectorAll('[data-operand]').forEach(btn => {
     btn.addEventListener('click', event => {
@@ -86,6 +98,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.querySelectorAll('[data-operator]').forEach(btn => {
     btn.addEventListener('click', event => {
+      /* 
+        Assign actual operand to memory and wait next operand
+        If we had a qeued operation (were waiting for 2nd operand),
+        resolves it and queues new operation
+      */
       if (calculator.memory.previousOperand !== undefined) {
         const result = calculator.operate(
           calculator.memory.previousOperand,
@@ -111,6 +128,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.querySelector('[data-equals]').addEventListener('click', event => {
+    
+    // Resolve operation only if we have a qeued one
+
     if (calculator.memory.previousOperand !== undefined) {
       const result = calculator.operate(
         calculator.memory.previousOperand,
@@ -120,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       memoryDisplay.update(mainDisplay.htmlElement.textContent);
       mainDisplay.reset();
-      mainDisplay.update(String(result));
+      mainDisplay.update(result);
       calculator.reset();
     }
   });
