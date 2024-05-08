@@ -110,31 +110,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Adding listeners
 
-  document.querySelectorAll('[data-number]').forEach(btn => {
+  const numberBtns = Array.from(document.querySelectorAll('[data-number]'));
+  const pointBtn = document.querySelector('[data-point]');
+  const changeBtn = document.querySelector('[data-change]');
+  const deleteBtn = document.querySelector('[data-delete]');
+  const clearBtn = document.querySelector('[data-clear]');
+  const operatorBtns = Array.from(document.querySelectorAll('[data-operator]'));
+  const equalsBtn = document.querySelector('[data-equals]');
+
+
+  numberBtns.forEach(btn => {
     btn.addEventListener('click', event => {
       mainDisplay.addNumber(event.currentTarget.textContent);
     });
   });
 
-  document.querySelector('[data-point]').addEventListener('click', () => {
+  pointBtn.addEventListener('click', () => {
     mainDisplay.addPoint();
   });
 
-  document.querySelector('[data-change]').addEventListener('click', () => {
+  changeBtn.addEventListener('click', () => {
     mainDisplay.changeSign();
   });
 
-  document.querySelector('[data-delete]').addEventListener('click', () => {
+  deleteBtn.addEventListener('click', () => {
     mainDisplay.delete();
   });
 
-  document.querySelector('[data-clear]').addEventListener('click', () => {
+  clearBtn.addEventListener('click', () => {
     calculator.reset();
     mainDisplay.reset();
     memoryDisplay.reset();
   });
 
-  document.querySelectorAll('[data-operator]').forEach(btn => {
+  operatorBtns.forEach(btn => {
     btn.addEventListener('click', event => {
       try {
         /* 
@@ -173,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  document.querySelector('[data-equals]').addEventListener('click', event => {
+  equalsBtn.addEventListener('click', event => {
     
     // Resolve operation only if we have a qeued one
 
@@ -195,6 +204,47 @@ document.addEventListener('DOMContentLoaded', () => {
         memoryDisplay.error(error.message);
         calculator.reset();
       }
+    }
+  });
+
+  document.addEventListener('keydown', event => {
+    if (Number.isInteger(Number(event.key))) {
+      const numberBtn = numberBtns.find(node => node.textContent === event.key);
+      numberBtn.click();
+      return;
+    }
+
+    const keyboardButtons = {
+      '.': pointBtn,
+      'Tab': changeBtn,
+      'Backspace': deleteBtn,
+      'Delete': clearBtn,
+    }
+
+    if (keyboardButtons[event.key]) {
+      keyboardButtons[event.key].click();
+      return;
+    }
+
+    const operatorTranslationMap = {
+      '+': '+',
+      '-': '-',
+      '×': '×',
+      '*': '×',
+      '÷': '÷',
+      '/': '÷',
+    }
+
+    if (operatorTranslationMap[event.key]) {
+      const symbol = operatorTranslationMap[event.key];
+      const operatorBtn = operatorBtns.find(node => node.textContent === symbol);
+      operatorBtn.click();
+      return;
+    }
+
+    if (event.key === '=' || event.key === 'Enter') {
+      equalsBtn.click();
+      return;
     }
   });
 });
@@ -219,9 +269,15 @@ function Calculator(maxDigits) {
   }
 
   this.operate = function(operand1, operator, operand2) {
+    if (operator === '÷' && operand2 === 0) throw new Error('Division by zero');
+
     let result = this.operations[operator](operand1, operand2);
 
-    if (result === Infinity) throw new Error('Division by zero');
+    /*
+      Ensure result is in the digit amount limits
+      In case its a decimal number, round to the max available precision
+      depending on the integer part length
+    */
     
     if (String(result).length > this.maxDigits) {
       if (Number.isInteger(result)) {
