@@ -207,7 +207,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Keyboard support
+
   document.addEventListener('keydown', event => {
+
     if (Number.isInteger(Number(event.key))) {
       const numberBtn = numberBtns.find(node => node.textContent === event.key);
       numberBtn.click();
@@ -225,6 +228,11 @@ document.addEventListener('DOMContentLoaded', () => {
       keyboardButtons[event.key].click();
       return;
     }
+
+    /* 
+      Map all of them to ensure 
+      Probably this is not the best way cause it is kinda rendundant
+    */
 
     const operatorTranslationMap = {
       '+': '+',
