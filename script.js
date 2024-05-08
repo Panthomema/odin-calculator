@@ -1,42 +1,64 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+  const calculator = new Calculator(12);
   const mainDisplay = new Display('#main-display', '0');
+  const memoryDisplay = new Display('#memory-display', '');
 
-  // Validates and updates the display content
+  // Inputs user selected number to the display
 
-  mainDisplay.update = function(value) {
+  mainDisplay.addNumber = function(num) {
     const display = this.htmlElement;
 
-    if (value.length > 16) {
-      display.textContent = 'Error';
+    if (/[^\d.-]/g.test(display.textContent)) {
+      display.textContent = num;
+      memoryDisplay.reset();
       return;
     }
 
-    if (display.textContent === '0' || display.textContent === 'Error') {
-      display.textContent = value;
+    if (display.textContent === '0') {
+      display.textContent = num;
       return;
     }
 
     if (display.textContent === '-0') {
-      display.textContent = '-' + value;
+      display.textContent = '-' + num;
       return;
     }
-    
-    if (value === '.' && display.textContent.includes('.')) return;
+
+    const nextContent = display.textContent + num;
   
-    const nextValue = display.textContent + value;
-  
-    if (nextValue.length <= 16) {
-      display.textContent += value;
+    if (nextContent.length <= calculator.maxDigits) {
+      display.textContent = nextContent;
     } 
   }
 
-  // Changes display content symbol
+  // Inputs user selected floating point to the display
 
-  mainDisplay.changeSymbol = function() {
+  mainDisplay.addPoint = function() {
     const display = this.htmlElement;
 
-    if (display.textContent === 'Error') return;
+    if (display.textContent.includes('.')) return;
+
+    if (/[^\d.-]/g.test(display.textContent)) {
+      display.textContent = 0;
+      memoryDisplay.reset();
+    }
+
+    display.textContent += '.';
+  }
+
+  // Replaces the content (for showing the result)
+
+  mainDisplay.update = function(value) {
+    this.htmlElement.textContent = value;
+  }
+
+  // Changes display content sign
+
+  mainDisplay.changeSign = function() {
+    const display = this.htmlElement;
+
+    if (/[^\d.-]/g.test(display.textContent)) return;
 
     if (display.textContent.includes('-')) {
       display.textContent = display.textContent.replace('-', '');
@@ -49,22 +71,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
   mainDisplay.delete = function() {
     const display = this.htmlElement;
-    let nextValue = display.textContent.slice(0, -1);
+    let nextContent = display.textContent.slice(0, -1);
 
-    if (nextValue.slice(-1) === '.') {
-      nextValue = nextValue.replace('.', '');
+    if (nextContent.slice(-1) === '.') {
+      nextContent = nextContent.replace('.', '');
     }
-    
-    if (/^-?\d+(\.\d+)?$/.test(nextValue)) {
-      display.textContent = nextValue;
+
+    if (/^-?\d+(\.\d+)?$/.test(nextContent)) {
+      display.textContent = nextContent;
     } else {
       this.reset();
     }
+
+    if (/[^\d.-]/g.test(nextContent)) {
+      memoryDisplay.reset();
+    }
   }
 
-  const memoryDisplay = new Display('#memory-display', '');
+  // Shows error message
 
-  // Updates the content
+  mainDisplay.error = function() {
+    this.htmlElement.textContent = 'Error';
+  }
+
+  // Updates the content 
 
   memoryDisplay.update = function(value) {
     this.htmlElement.textContent += (this.htmlElement.textContent === '')
@@ -72,18 +102,26 @@ document.addEventListener('DOMContentLoaded', () => {
       : ' ' + value;
   }
 
-  const calculator = new Calculator();
+  // Shows error message
+
+  memoryDisplay.error = function(message) {
+    this.htmlElement.textContent = message;
+  }
 
   // Adding listeners
 
-  document.querySelectorAll('[data-operand]').forEach(btn => {
+  document.querySelectorAll('[data-number]').forEach(btn => {
     btn.addEventListener('click', event => {
-      mainDisplay.update(event.currentTarget.textContent);
+      mainDisplay.addNumber(event.currentTarget.textContent);
     });
   });
 
+  document.querySelector('[data-point]').addEventListener('click', () => {
+    mainDisplay.addPoint();
+  });
+
   document.querySelector('[data-change]').addEventListener('click', () => {
-    mainDisplay.changeSymbol();
+    mainDisplay.changeSign();
   });
 
   document.querySelector('[data-delete]').addEventListener('click', () => {
@@ -98,32 +136,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.querySelectorAll('[data-operator]').forEach(btn => {
     btn.addEventListener('click', event => {
-      /* 
-        Assign actual operand to memory and wait next operand
-        If we had a qeued operation (were waiting for 2nd operand),
-        resolves it and queues new operation
-      */
-      if (calculator.memory.previousOperand !== undefined) {
-        const result = calculator.operate(
-          calculator.memory.previousOperand,
-          calculator.memory.operator,
-          Number(mainDisplay.htmlElement.textContent)
-        );
+      try {
+        /* 
+          Assign actual operand to memory and wait next operand
+          If we had a qeued operation (were waiting for 2nd operand),
+          resolves it and queues new operation
+        */
+        if (calculator.memory.previousOperand !== undefined) {
+        
+          const result = calculator.operate(
+            calculator.memory.previousOperand,
+            calculator.memory.operator,
+            Number(mainDisplay.htmlElement.textContent)
+          );
 
-        calculator.memory.previousOperand = result;
-        calculator.memory.operator = event.currentTarget.textContent
+          calculator.memory.previousOperand = result;
+          calculator.memory.operator = event.currentTarget.textContent
 
-      } else {
+        } else {
 
-        if (/[^\d.-]/g.test(mainDisplay.htmlElement.textContent)) return;
-        calculator.memory.previousOperand = mainDisplay.htmlElement.textContent;
-        calculator.memory.operator = event.currentTarget.textContent;
+          if (/[^\d.-]/g.test(mainDisplay.htmlElement.textContent)) return;
+          calculator.memory.previousOperand = mainDisplay.htmlElement.textContent;
+          calculator.memory.operator = event.currentTarget.textContent;
+        }
+
+        memoryDisplay.reset();
+        memoryDisplay.update(calculator.memory.previousOperand);
+        memoryDisplay.update(calculator.memory.operator);
+        mainDisplay.reset();
+
+      } catch(error) {
+        mainDisplay.error();
+        memoryDisplay.error(error.message);
+        calculator.reset();
       }
-
-      memoryDisplay.reset();
-      memoryDisplay.update(calculator.memory.previousOperand);
-      memoryDisplay.update(calculator.memory.operator);
-      mainDisplay.reset();
     });
   });
 
@@ -132,16 +178,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // Resolve operation only if we have a qeued one
 
     if (calculator.memory.previousOperand !== undefined) {
-      const result = calculator.operate(
-        calculator.memory.previousOperand,
-        calculator.memory.operator,
-        Number(mainDisplay.htmlElement.textContent)
-      );
+      try {
+        const result = calculator.operate(
+          calculator.memory.previousOperand,
+          calculator.memory.operator,
+          Number(mainDisplay.htmlElement.textContent)
+        );
+  
+        memoryDisplay.update(mainDisplay.htmlElement.textContent);
+        mainDisplay.reset();
+        mainDisplay.update(result);
+        calculator.reset();
 
-      memoryDisplay.update(mainDisplay.htmlElement.textContent);
-      mainDisplay.reset();
-      mainDisplay.update(result);
-      calculator.reset();
+      } catch (error) {
+        mainDisplay.error();
+        memoryDisplay.error(error.message);
+        calculator.reset();
+      }
     }
   });
 });
@@ -151,7 +204,8 @@ function Display(selector, resetValue) {
   this.reset = () => { this.htmlElement.textContent = resetValue };
 }
 
-function Calculator() {
+function Calculator(maxDigits) {
+  this.maxDigits = maxDigits;
   this.memory = new Memory();
   this.reset = function() {
     this.memory = new Memory();
@@ -165,7 +219,26 @@ function Calculator() {
   }
 
   this.operate = function(operand1, operator, operand2) {
-    return this.operations[operator](operand1, operand2);
+    let result = this.operations[operator](operand1, operand2);
+
+    if (result === Infinity) throw new Error('Division by zero');
+    
+    if (String(result).length > this.maxDigits) {
+      if (Number.isInteger(result)) {
+        throw new Error(`Max digits (${this.maxDigits}) exceeded`);
+      }
+      
+      const integerPart = String(result).split('.')[0] + '.';
+      const availableSpace = this.maxDigits - integerPart.length;
+
+      if (availableSpace < 1) {
+        throw new Error(`Max digits (${this.maxDigits}) exceeded`);
+      }
+
+      result = Number(result.toFixed(availableSpace));
+    }
+
+    return result;
   }
 }
 
@@ -178,7 +251,7 @@ function Memory() {
       return this._previousOperand;
     },
     set: function(value) {
-      this._previousOperand = Math.round(Number(value) * 1000) / 1000;
+      this._previousOperand = Number(value);
     }
   });
 

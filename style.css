@@ -36,7 +36,7 @@ button {
 
 :root {
   --color-general: #363636;
-  --border-general: clamp(2px, 0.4vmin, 6px) solid var(--color-general);
+  --border-general: clamp(3px, 0.4vmin, 7px) solid var(--color-general);
   --bg-calculator: #a7a7a7;
 
   --color-btn-general: #eeeeee;
@@ -55,9 +55,9 @@ button {
   --color-btn-yellow-hover: #d3b35d;
   --color-btn-yellow-active: #b1913b;
 
-  --fs-general: clamp(1rem, 3vmin, 3rem);
-  --fs-prev-operation: clamp(0.75rem, 3vmin, 3rem);
-  --fs-curr-operation: clamp(2rem, 6vmin, 6rem);
+  --fs-general: clamp(1rem, 4vmin, 4rem);
+  --fs-memory-display: clamp(0.75rem, 3vmin, 3rem);
+  --fs-main-display: clamp(1.5rem, 6vmin, 6rem);
   --ff-general: 'Open sans', sans-serif;
 }
 
@@ -124,10 +124,9 @@ button {
 }
 
 
-@media (min-width: 1024px) {
+@media (min-width: 1024px) and (min-aspect-ratio: 3/4) {
   #calculator {
     height: 90%;
-    width: auto;
   }
 }
 
@@ -153,11 +152,11 @@ button {
 }
 
 #memory-display {
-  font-size: var(--fs-prev-operation);
+  font-size: var(--fs-memory-display);
 }
 
 #main-display {
-  font-size: var(--fs-curr-operation);
+  font-size: var(--fs-main-display);
 }
 
 button {
